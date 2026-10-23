@@ -1,5 +1,5 @@
 /* Service Worker — آفلاین واقعی برنامه‌ریز علوم پایه */
-const CACHE = 'bsp-app-v6';
+const CACHE = 'bsp-app-v7';
 const CORE = [
   './',
   './index.html',

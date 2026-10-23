@@ -11,7 +11,6 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/icon-512.png" />
-  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiYmVybmFtZWhyaXogb2x1bSBwYXllIDE0MDUiLCJzaG9ydF9uYW1lIjoiYmVybmFtZWhyaXoiLCJzdGFydF91cmwiOiIuLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwZjE3MmEiLCJ0aGVtZV9jb2xvciI6IiMwZjE3MmEiLCJsYW5nIjoiZmEiLCJkaXIiOiJydGwifQ==" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script>
@@ -3396,7 +3395,8 @@
       const tests = +t.testsDone || 0;
       const correct = +t.correct || 0;
       const log = {
-        date: new Date().toISOString().slice(0,10),
+        // Daily records follow the device calendar, not UTC.
+        date: localDateKey(),
         jalali: formatJalaliToday(),
         dayNum: getDayNumber(),
         phase: getPhase(getDayNumber()).short,
@@ -4113,7 +4113,7 @@
       let habitDays = 0, habitOk = 0;
       for (let i = 0; i < 7; i++) {
         const d = new Date(); d.setDate(d.getDate() - i);
-        const key = d.toISOString().slice(0, 10);
+        const key = localDateKey(d);
         const dayLog = state.habitLogs?.[key] || {};
         if (Object.keys(dayLog).length) habitDays++;
         const critDone = criticalHabits.filter(h => dayLog[h.id]).length;
@@ -5523,7 +5523,25 @@
       return Array.from(map.values());
     }
 
+    function validateImportedState(remoteRaw) {
+      const payload = remoteRaw && remoteRaw.state && remoteRaw.app === 'bsp_1405'
+        ? remoteRaw.state : remoteRaw;
+      if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new Error('invalid backup');
+      const arrayKeys = ['dailyLogs','errors','reviews','topics','weekly','examHistory','habits'];
+      for (const key of arrayKeys) {
+        if (payload[key] != null && !Array.isArray(payload[key])) throw new Error('invalid backup field');
+      }
+      if (payload.habitLogs != null && (typeof payload.habitLogs !== 'object' || Array.isArray(payload.habitLogs))) {
+        throw new Error('invalid backup field');
+      }
+      if (payload.settings != null && (typeof payload.settings !== 'object' || Array.isArray(payload.settings))) {
+        throw new Error('invalid backup settings');
+      }
+      return payload;
+    }
+
     function applyMergedState(remoteRaw) {
+      validateImportedState(remoteRaw);
       let remote = remoteRaw;
       if (remote && remote.state && remote.app === 'bsp_1405') remote = remote.state;
       if (!remote || typeof remote !== 'object') throw new Error('invalid');
@@ -5554,6 +5572,7 @@
     }
 
     function applyFullReplaceState(remoteRaw) {
+      validateImportedState(remoteRaw);
       let remote = remoteRaw;
       if (remote && remote.state && remote.app === 'bsp_1405') remote = remote.state;
       if (!remote || typeof remote !== 'object') throw new Error('invalid');
