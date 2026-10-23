@@ -175,17 +175,23 @@
     .swipe-hint { height: 4px; width: 40px; background:#cbd5e1; border-radius:999px; margin: 0 auto 12px; }
     body.dark .swipe-hint { background:#475569; }
     .empty-cta { display:flex; flex-direction:column; align-items:center; gap:0.75rem; padding:2rem 1rem; }
+    .skip-link { position:fixed; top:.5rem; right:.5rem; z-index:100; transform:translateY(-180%); background:#0f172a; color:#fff; padding:.65rem .9rem; border-radius:.65rem; font-size:.8rem; transition:transform .2s; }
+    .skip-link:focus { transform:translateY(0); outline:3px solid #38bdf8; outline-offset:2px; }
+    :focus-visible { outline:3px solid #38bdf8; outline-offset:2px; }
+    .input[aria-invalid="true"] { border-color:#e11d48; box-shadow:0 0 0 2px rgba(225,29,72,.15); }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; transition-duration:.01ms !important; } }
 
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
+  <a class="skip-link" href="#main">پرش به محتوای اصلی</a>
 
   <!-- Header -->
   <header class="sticky top-0 z-40 bg-surface-900 text-white safe-top shadow-lg">
     <div class="px-4 py-3 flex items-center justify-between">
       <div>
         <h1 class="text-base font-bold leading-tight">برنامه‌ریز علوم پایه</h1>
-        <p class="text-[11px] text-slate-300 mt-0.5" id="header-sub">آزمون ۱۵ بهمن ۱۴۰۵ · نسخه ۳</p>
+        <p class="text-[11px] text-slate-300 mt-0.5" id="header-sub" aria-live="polite">در حال بارگذاری…</p>
       </div>
       <div class="text-left">
         <div class="text-2xl font-bold tabular-nums" id="days-left">—</div>
@@ -195,7 +201,7 @@
   </header>
   <div id="app-toast" role="status" aria-live="polite"></div>
 
-  <main class="px-3 pt-3 max-w-lg mx-auto" id="main">
+  <main class="px-3 pt-3 max-w-lg mx-auto" id="main" tabindex="-1">
 
     <!-- PWA install + offline banners (GitHub PWA patterns) -->
     <div id="pwa-install-banner" class="hidden mb-3 rounded-xl border border-sky-200 bg-sky-50 p-3">
@@ -270,7 +276,7 @@
         </div>
         <div class="mt-3">
           <div class="flex justify-between text-[10px] text-slate-300 mb-1"><span>پیشرفت امروز</span><span id="today-progress-text">۰٪</span></div>
-          <div class="h-2 rounded-full bg-white/15 overflow-hidden"><div id="today-progress-fill" class="h-full rounded-full bg-sky-400 transition-all" style="width:0%"></div></div>
+          <div class="h-2 rounded-full bg-white/15 overflow-hidden"><div id="today-progress-fill" class="h-full rounded-full bg-sky-400 transition-all" role="progressbar" aria-label="پیشرفت امروز" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="width:0%"></div></div>
         </div>
         <div class="mt-3 flex gap-2">
           <button class="flex-1 text-[11px] py-2 rounded-xl bg-white/15 text-sky-100" id="btn-morning-mode" onclick="toggleMorningMode()">☀ حالت ۳ دقیقه صبح</button>
@@ -1323,23 +1329,23 @@
   <!-- Bottom Nav -->
   <nav class="bottom-nav fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 z-50">
     <div class="grid grid-cols-5 max-w-lg mx-auto">
-      <button class="nav-item active" data-tab="today" onclick="switchTab('today')">
+      <button class="nav-item active" data-tab="today" aria-current="page" aria-label="امروز" onclick="switchTab('today')">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
         امروز
       </button>
-      <button class="nav-item" data-tab="review" onclick="switchTab('review')">
+      <button class="nav-item" data-tab="review" aria-label="مرور" onclick="switchTab('review')">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
         مرور
       </button>
-      <button class="nav-item" data-tab="errors" onclick="switchTab('errors')">
+      <button class="nav-item" data-tab="errors" aria-label="خطاها" onclick="switchTab('errors')">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
         خطا
       </button>
-      <button class="nav-item" data-tab="habits" onclick="switchTab('habits')">
+      <button class="nav-item" data-tab="habits" aria-label="عادت‌ها" onclick="switchTab('habits')">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         عادت
       </button>
-      <button class="nav-item" data-tab="more" onclick="switchTab('more')">
+      <button class="nav-item" data-tab="more" aria-label="بیشتر" onclick="switchTab('more')">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         بیشتر
       </button>
@@ -1844,9 +1850,7 @@
       }
       saveState(true);
       try {
-        document.getElementById('days-left').textContent = getDaysLeft();
-        document.getElementById('header-sub').textContent =
-          `آزمون · روز ${getDayNumber()} · ${getDaysLeft()} روز مانده`;
+        renderHeaderMeta();
         renderToday();
       } catch(e) {}
       showToast('تاریخ‌ها ذخیره شد', 'ok');
@@ -1951,13 +1955,31 @@
       } catch { return new Date().toLocaleDateString('fa-IR'); }
     }
 
+    function renderHeaderMeta() {
+      const days = getDaysLeft();
+      const daysEl = document.getElementById('days-left');
+      const sub = document.getElementById('header-sub');
+      if (daysEl) daysEl.textContent = days;
+      if (sub) {
+        const examLabel = state.settings?.examDate ? formatIsoJalali(state.settings.examDate) : 'آزمون';
+        sub.textContent = `آزمون ${examLabel} · روز ${getDayNumber()}`;
+      }
+    }
+
     // Nav
     function switchTab(tab) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.remove('active');
+        el.removeAttribute('aria-current');
+      });
       const panel = document.getElementById('tab-' + tab);
       if (panel) panel.classList.add('active');
-      document.querySelector(`.nav-item[data-tab="${tab}"]`)?.classList.add('active');
+      const navItem = document.querySelector(`.nav-item[data-tab="${tab}"]`);
+      if (navItem) {
+        navItem.classList.add('active');
+        navItem.setAttribute('aria-current', 'page');
+      }
       try {
         if (tab === 'dashboard') renderDashboard();
         if (tab === 'errors') renderErrors();
@@ -2985,6 +3007,7 @@
 
     function renderToday() {
       ensureToday();
+      renderHeaderMeta();
       document.getElementById('today-jalali').textContent = formatJalaliToday();
       const phase = getPhase(getDayNumber());
 
@@ -3022,7 +3045,10 @@
       const tpt = document.getElementById('today-progress-text');
       if (tpt) tpt.textContent = cp + '٪';
       const tpf = document.getElementById('today-progress-fill');
-      if (tpf) tpf.style.width = cp + '%';
+      if (tpf) {
+        tpf.style.width = cp + '%';
+        tpf.setAttribute('aria-valuenow', String(cp));
+      }
       const hp2 = document.getElementById('header-progress');
       if (hp2) hp2.textContent = cp + '٪';
       renderSessions();
@@ -3280,7 +3306,33 @@
       const el = document.getElementById(id);
       return el ? el.value : '';
     }
+    function validateTodayInputs() {
+      const tests = Number(val('tests-done')) || 0;
+      const correct = Number(val('correct')) || 0;
+      const numericIds = ['sleep','study-min','reviews-done','tests-done','correct'];
+      for (const id of numericIds) {
+        const el = document.getElementById(id);
+        const value = Number(el?.value);
+        if (el && el.value !== '' && (!Number.isFinite(value) || value < 0)) {
+          el.setAttribute('aria-invalid', 'true');
+          el.focus();
+          showToast('مقدارهای عددی نمی‌توانند منفی یا نامعتبر باشند.', 'warn', 2800);
+          return false;
+        }
+        el?.removeAttribute('aria-invalid');
+      }
+      if (correct > tests) {
+        const el = document.getElementById('correct');
+        el?.setAttribute('aria-invalid', 'true');
+        el?.focus();
+        showToast('تعداد پاسخ درست نمی‌تواند از تعداد تست بیشتر باشد.', 'warn', 2800);
+        return false;
+      }
+      return true;
+    }
+
     function saveToday() {
+      if (!validateTodayInputs()) return false;
       if (!state.today) state.today = JSON.parse(JSON.stringify(DEFAULTS.today));
       state.today = {
         ...state.today,
@@ -3390,7 +3442,7 @@
     }
 
     function completeToday() {
-      saveToday();
+      if (!saveToday()) return;
       const t = state.today;
       const tests = +t.testsDone || 0;
       const correct = +t.correct || 0;
@@ -5896,9 +5948,7 @@
         ensureToday();
         if (!state.settings) state.settings = { ...DEFAULTS.settings };
         const dl = document.getElementById('days-left');
-        if (dl) dl.textContent = getDaysLeft();
-        const hs = document.getElementById('header-sub');
-        if (hs) hs.textContent = `آزمون ۱۵ بهمن ۱۴۰۵ · روز ${getDayNumber()}`;
+        renderHeaderMeta();
         const setStudy = document.getElementById('set-study');
         if (setStudy) setStudy.value = state.settings.studyGoal || 240;
         const setTest = document.getElementById('set-test');
